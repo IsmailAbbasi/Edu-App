@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Role Selection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: inline-block;
+            text-align: left;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .container h2 {
+            margin-bottom: 20px;
+        }
+        .container button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+        }
+        .container button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Select Your Role</h2>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="role" value="teacher">I am a Teacher</button>
+        </form>
+    </div>
+    <div class="container">
+        <h2>Select Your Role</h2>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" name="role" value="student">I am a Student</button>
+        </form>
+    </div>
+</body>
+</html>
