@@ -1,11 +1,57 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Student Page</title>
-    <!-- Add any CSS styles here -->
-</head>
-<body>
-    <h1>Welcome, Student!</h1>
-    
-</body>
-</html>
+{% extends "home.html" %}
+
+{% block content %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'account/css/student.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="form-container">
+    <form>
+        <div class="form-row">
+            <label class="form-label" for="inlineFormInput">Name</label>
+            <input type="text" class="form-control" id="inlineFormInput" placeholder="Jane Doe">
+        </div>
+
+        <div class="form-row">
+            <label class="form-label" for="inlineFormInputGroup">Username</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">@</div>
+                </div>
+                <input type="text" class="form-control" id="inlineFormInputGroup" placeholder="Username">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label class="form-label" for="cityInput">City</label>
+            <input type="text" class="form-control" id="cityInput" placeholder="City">
+        </div>
+
+        <div class="form-row">
+            <label class="form-label" for="stateInput">State</label>
+            <input type="text" class="form-control" id="stateInput" placeholder="State">
+        </div>
+
+        <div class="form-row">
+            <label class="form-label" for="zipInput">Zip</label>
+            <input type="text" class="form-control" id="zipInput" placeholder="Zip">
+        </div>
+
+        <div class="form-row">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="autoSizingCheck">
+                <label class="form-check-label" for="autoSizingCheck">
+                    Remember me
+                </label>
+            </div>
+        </div>
+
+        <div class="form-row button-group">
+            <button type="button" class="btn btn-filter">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

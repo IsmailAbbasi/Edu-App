@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher
+from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher , save_teachers_data
 from django.shortcuts import redirect
 
 
@@ -24,8 +24,6 @@ urlpatterns = [
     path("eduapp/", include("eduapp.urls")),
     path("admin/", admin.site.urls),
     path('accounts/', include('allauth.urls')),
-    # path('signup/', signup, name='signup'),
-    # path('login/', login, name='login'),
     path('', home, name='home'),
     path('home/', home, name='home'),
     path('contact/', contact, name='contact'),
@@ -35,7 +33,7 @@ urlpatterns = [
     path('student/', student, name='student_page'),  # Add name for the student page
     path('teacher/', teacher, name='teacher_page'),
     path('signup/', CustomSignupView.as_view(), name='account_signup'),
-
+    path('save_teachers_data/', save_teachers_data, name='save_teachers_data'),
 
 ]
 

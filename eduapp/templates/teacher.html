@@ -5,69 +5,96 @@
 <link rel="stylesheet" href="{% static 'account/css/teachers.css' %}">
 
 <h2>Teacher Registration Form</h2>
-<form>
+<!-- The form should have method="POST" and action="{% url 'save_teachers_data' %}" -->
+<form method="POST" action="{% url 'save_teachers_data' %}">
+    {% csrf_token %}  <!-- Include CSRF token for security -->
+    
     <div class="form-row">
         <div class="col-md-4 mb-3">
-            <label for="validationServer01">First name</label>
-            <input type="text" class="form-control is-valid" id="validationServer01" placeholder="First name" value="Mark" required>
+            <label for="id_first_name">First name</label>
+            <input type="text" name="firstName" class="form-control is-valid" id="id_first_name" placeholder="First name" required>
             <div class="valid-feedback">
                 Looks good!
             </div>
         </div>
         <div class="col-md-4 mb-3">
-            <label for="validationServer02">Last name</label>
-            <input type="text" class="form-control is-valid" id="validationServer02" placeholder="Last name" value="Otto" required>
+            <label for="id_last_name">Last name</label>
+            <input type="text" name="lastName" class="form-control is-valid" id="id_last_name" placeholder="Last name" required>
             <div class="valid-feedback">
                 Looks good!
             </div>
         </div>
         <div class="col-md-4 mb-3">
-            <label for="validationServerUsername">Username</label>
+            <label for="id_username">Username</label>
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <span class="input-group-text" id="inputGroupPrepend3">@</span>
+                    <span class="input-group-text">@</span>
                 </div>
-                <input type="text" class="form-control is-invalid" id="validationServerUsername" placeholder="Username" aria-describedby="inputGroupPrepend3" required>
+                <input type="text" name="username" class="form-control is-invalid" id="id_username" placeholder="Username" required>
                 <div class="invalid-feedback">
                     Please choose a username.
                 </div>
             </div>
         </div>
     </div>
+
     <div class="form-row">
         <div class="col-md-6 mb-3">
-            <label for="validationServer03">City</label>
-            <input type="text" class="form-control is-invalid" id="validationServer03" placeholder="City" required>
+            <label for="id_city">City</label>
+            <input type="text" name="city" class="form-control is-invalid" id="id_city" placeholder="City" required>
             <div class="invalid-feedback">
                 Please provide a valid city.
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <label for="validationServer04">State</label>
-            <input type="text" class="form-control is-invalid" id="validationServer04" placeholder="State" required>
+            <label for="id_state">State</label>
+            <input type="text" name="state" class="form-control is-invalid" id="id_state" placeholder="State" required>
             <div class="invalid-feedback">
                 Please provide a valid state.
             </div>
         </div>
         <div class="col-md-3 mb-3">
-            <label for="validationServer05">Zip</label>
-            <input type="text" class="form-control is-invalid" id="validationServer05" placeholder="Zip" required>
+            <label for="id_zip">Zip</label>
+            <input type="text" name="zipcode" class="form-control is-invalid" id="id_zip" placeholder="Zip" required>
             <div class="invalid-feedback">
                 Please provide a valid zip.
             </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="form-check">
-            <input class="form-check-input is-invalid" type="checkbox" value="" id="invalidCheck3" required>
-            <label class="form-check-label" for="invalidCheck3">
-                Agree to terms and conditions 
-            </label>
+        <div class="col-md-3 mb-3">
+            <label for="id_experience">Experience in Years</label>
+            <input type="number" name="experience" class="form-control is-invalid" id="id_experience" placeholder="In Numbers" required>
             <div class="invalid-feedback">
-                
+                Please provide valid experience.
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label for="id_subjects">Subjects</label>
+            <input type="text" name="subjects" class="form-control is-invalid" id="id_subjects" placeholder="Subjects" required>
+            <div class="invalid-feedback">
+                Please provide valid subjects.
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label for="id_previous_experience">Previous Experience</label>
+            <input type="text" name="previousexperience" class="form-control is-invalid" id="id_previous_experience" placeholder="Previous Experience" required>
+            <div class="invalid-feedback">
+                Please provide valid previous experience.
             </div>
         </div>
     </div>
+
+    <div class="form-group">
+        <div class="form-check">
+            <input class="form-check-input is-invalid" type="checkbox" value="" id="id_agree" required>
+            <label class="form-check-label" for="id_agree">
+                Agree to terms and conditions
+            </label>
+            <div class="invalid-feedback">
+                You must agree before submitting.
+            </div>
+        </div>
+    </div>
+
     <button class="btn btn-primary" type="submit">Submit form</button>
 </form>
 {% endblock %}
