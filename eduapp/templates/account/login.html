@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Login V1</title>
+    <title>Login</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--===============================================================================================-->    
@@ -22,6 +22,34 @@
     <link rel="stylesheet" type="text/css" href="{% static 'account/css/util.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'account/css/main.css' %}">
     <!--===============================================================================================-->
+    <style>
+        .error-messages {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+
+        .error-messages span {
+            display: block;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .wrap-input100 {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .wrap-input100 .text-danger {
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            font-size: 12px;
+        }
+    </style>
 </head>
 <body>
     
@@ -38,14 +66,16 @@
                         Member Login
                     </span>
 
+                    <!-- Login Field (Email or Username) -->
                     <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-                        <input class="input100" type="text" name="login" placeholder="Email or Username">
+                        <input class="input100" type="text" name="login" placeholder="Email or Username" value="{{ form.login.value|default_if_none:'' }}">
                         <span class="focus-input100"></span>
                         <span class="symbol-input100">
                             <i class="fa fa-envelope" aria-hidden="true"></i>
                         </span>
                     </div>
 
+                    <!-- Password Field -->
                     <div class="wrap-input100 validate-input" data-validate="Password is required">
                         <input class="input100" type="password" name="password" placeholder="Password">
                         <span class="focus-input100"></span>
@@ -53,7 +83,21 @@
                             <i class="fa fa-lock" aria-hidden="true"></i>
                         </span>
                     </div>
-                    
+
+                    <!-- Error messages for both fields below the password field -->
+                    <div class="error-messages">
+                        {% if form.login.errors %}
+                            <span>{{ form.login.errors.0 }}</span>
+                        {% endif %}
+                        {% if form.password.errors %}
+                            <span>{{ form.password.errors.0 }}</span>
+                        {% endif %}
+                        {% if form.non_field_errors %}
+                            <span>{{ form.non_field_errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Login button -->
                     <div class="container-login100-form-btn">
                         <button class="login100-form-btn">
                             Login

@@ -10,4 +10,4 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(TeachersData)
 
 class TeachersDataAdmin(admin.ModelAdmin):
-    list_display = ('username', 'firstName', 'lastName', 'city', 'state', 'zipcode', 'experience', 'subjects', 'previousexperience', 'pub_date')
+    list_display = ('username', 'firstName', 'lastName', 'city', 'state', 'zipcode', 'experience', 'subjects', 'previousexperience', 'pub_date','email' , 'contact' , 'class_range','photo')

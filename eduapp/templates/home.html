@@ -1,128 +1,25 @@
 {% block content %}
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+  <link rel="stylesheet" href="{% static 'account/css/main.css' %}">
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Directory</title>
-  
-  <!-- Font and Bootstrap -->
+
+  <!-- Bootstrap and Google Fonts -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-      background-color: #f5f7fa;
-    }
-    
-    /* Navbar Styling */
-    .navbar {
-      background-color: #343a40;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-    .navbar .navbar-brand, .navbar-nav .nav-link {
-      color: #fff !important;
-    }
-
-    /* Sidebar Styling */
-    .sidebar {
-      background-color: #2c3036;
-      min-height: 100vh;
-      position: fixed;
-      width: 200px;
-      padding: 20px;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
-    }
-    .sidebar a {
-      color: #ddd;
-      text-decoration: none;
-      display: block;
-      padding: 10px 15px;
-      border-radius: 4px;
-    }
-    .sidebar a:hover {
-      background-color: #1d2124;
-      color: #fff;
-    }
-
-    /* Main Container */
-    .main-content {
-      margin-left: 220px;
-      padding: 20px;
-    }
-
-    /* Search & Filter Section */
-    .filter-section {
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-    }
-    
-    .filter-section input, 
-    .filter-section select, 
-    .filter-section button {
-      margin-bottom: 10px;
-      border-radius: 30px;
-      padding: 10px;
-      font-size: 14px;
-    }
-
-    .filter-section input, 
-    .filter-section select {
-      flex: 1 1 auto;
-      min-width: 200px;
-      margin-right: 15px;
-    }
-    
-    .filter-section .btn-outline-success {
-      flex: 0 1 120px;
-      margin-right: 0;
-      margin-left: auto;
-    }
-
-    /* Cards Styling */
-    .teacher-card {
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-      background-color: #fff;
-      margin-bottom: 20px;
-    }
-    .teacher-card:hover {
-      box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-    }
-    .teacher-card .card-header {
-      background-color: #007bff;
-      color: white;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    /* Button Styling */
-    .btn-primary, .btn-outline-success {
-      border-radius: 30px;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    /* Footer */
-    .footer {
-      background-color: #343a40;
-      color: #ddd;
-      text-align: center;
-      padding: 20px;
-      position: relative;
-      width: 100%;
-      margin-top: 50px;
-    }
-
+  
   </style>
 </head>
 
@@ -131,7 +28,7 @@
   <div class="sidebar">
     <h4 class="text-light">Menu</h4>
     <a href="/">Dashboard</a>
-    <a href="/profile">Profile</a>
+    <a href="/profile/1">Profile</a>
     <a href="/teachers">Teachers</a>
     <a href="/logout">Logout</a>
   </div>
@@ -166,64 +63,154 @@
       </div>
     </nav>
 
-    <!-- Filter & Search Section -->
     <div class="filter-section">
       <form method="GET" action="{% url 'home' %}" class="form-inline w-100">
-        <input class="form-control" type="search" name="location" placeholder="Search by Location">
-        <input class="form-control" type="search" name="subject" placeholder="Search by Subject">
-
-        <!-- Dropdown for Experience -->
-        <select class="form-control" name="experience">
+        <input class="form-control" type="search" name="city" placeholder="Search by City" value="{{ request.GET.city }}">
+        <input class="form-control" type="search" name="state" placeholder="Search by State" value="{{ request.GET.state }}">
+        <input class="form-control" type="search" name="subject" placeholder="Search by Subject" value="{{ request.GET.subject }}">
+        
+        <!-- Class Dropdown -->
+        <select class="form-control" name="class" id="class-select">
+          <option value="" disabled selected>Class</option>
+          <option value="any">Any</option>
+          <option value="1">1 Class</option>
+          <option value="2">2 Class</option>
+          <option value="3">3 Class</option>
+          <option value="4">4 Class</option>
+          <option value="5">5 Class</option>
+          <option value="6">6 Class</option>
+          <option value="7">7 Class</option>
+          <option value="8">8 Class</option>
+          <option value="9">9 Class</option>
+          <option value="10">10 Class</option>
+          <option value="11">11 Class</option>
+          <option value="12">12 Class</option>
+        </select>
+    
+        <!-- Experience Dropdown -->
+        <select class="form-control" name="experience" id="experience-select">
           <option value="" disabled selected>Experience</option>
+          <option value="any">Any</option>
           <option value="1">1 year</option>
           <option value="2">2 years</option>
           <option value="3">3 years</option>
           <option value="5">5+ years</option>
-          <option value="10">10+ years</option>
         </select>
-
-        <!-- Dropdown for Mode -->
-        <select class="form-control" name="mode">
-          <option value="" disabled selected>Mode</option>
-          <option value="offline">Offline</option>
-          <option value="online">Online</option>
-          <option value="both">Both</option>
-        </select>
-
+    
         <button class="btn btn-outline-success" type="submit">Search</button>
       </form>
     </div>
+    
+<!-- Teacher Cards -->
+<div class="row">
+  {% for teacher in teachers %}
+  <div class="col-md-4 mb-4">
+    <div class="card shadow-sm">
+      <div class="card-header text-center position-relative">
+        
+        <!-- Only show edit button if the logged-in user is the teacher's user -->
+        {% if teacher.user == request.user %}
+        <div class="edit-button">
+          <a href="{% url 'edit_profile' teacher.id %}" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-edit"></i>
+          </a>
+        </div>
+        {% endif %}
 
-    <!-- Cards Displaying Teachers -->
-    <div class="row">
-      {% for teacher in teachers %}
-      <div class="col-md-4">
-        <div class="teacher-card">
-          <div class="card-header">{{ teacher.firstName }} {{ teacher.lastName }}</div>
-          <div class="card-body">
-            <p>City: {{ teacher.city }}</p>
-            <p>State: {{ teacher.state }}</p>
-            <p>Experience: {{ teacher.experience }} years</p>
-            <p>Subjects: {{ teacher.subjects }}</p>
+        {% if teacher.photo %}
+        <img src="{{ teacher.photo.url }}" alt="Profile Picture" class="profile-picture">
+    {% else %}
+        <img src="{% static 'account/images/default-profile-picture1.jpg' %}" alt="Default Profile Picture" class="profile-picture">
+    {% endif %}
+    
+    
+    
+    
+      </div>
+
+        <div class="card-body">
+          <h5 class="card-title text-center">{{ teacher.firstName }} {{ teacher.lastName }}</h5>
+          <p class="card-text text-center">XXXq1@gmail.com</p>
+          <p class="card-text"><strong>City:</strong> {{ teacher.city }}</p>
+          <p class="card-text"><strong>State:</strong> {{ teacher.state }}</p>
+          <p class="card-text"><strong>Experience:</strong> {{ teacher.experience|floatformat:0 }} years</p>
+          <p class="card-text"><strong>Subjects:</strong> {{ teacher.subjects }}</p>
+          <p class="card-text"><strong>Teaches Class</strong> {{ teacher.class_range  }}</p>
+          <p class="card-text"><strong>Email</strong> XXXq1@gmail.com</p>
+          <p class="card-text"><strong>Phone no</strong> +9173XXXXXXXX</p>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <!-- Social Media Icons -->
+          <div class="social-icons">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin"></i></a>
           </div>
+
+          <!-- Contact Button -->
+          <button class="btn btn-primary contact-button" onclick="openContactPopup('{{ teacher.id }}', '{{ teacher.email }}')">Contact</button>
         </div>
       </div>
-      {% empty %}
-      <p>No teachers found.</p>
-      {% endfor %}
     </div>
-
+    {% endfor %}
   </div>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <div class="container">
-      <span>© 2024 Teacher Directory. All rights reserved.</span>
+  <!-- Global Popup Modal (Outside Cards) -->
+  <div id="contactPopup" class="popup">
+    <div class="popup-content">
+      <span class="close-btn" onclick="closeContactPopup()">&times;</span>
+      <!-- Contact information (will be dynamically updated) -->
+      <p id="popupContactInfo">Contact information is currently hidden.</p>
+      <!-- Make Payment button -->
+      <button class="btn btn-success" id="paymentButton">Make Payment to View Contact Info</button>
     </div>
-  </footer>
+  </div>
 
+<!-- Footer -->
+<footer class="footer">
+  <div class="container text-center">
+      <p class="text-muted">© 2024 Your Company Name. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  let activePopup = null;  // Keep track of the currently active popup
+    let currentTeacherId = null;  // Track the currently viewed teacher
+
+    function closeContactPopup() {
+      document.getElementById('contactPopup').style.display = 'none';
+      activePopup = null;  // Reset the active popup
+    }
+
+    function openContactPopup(teacherId, email) {
+      // If it's the same teacher, don't reopen
+      if (currentTeacherId === teacherId && activePopup) {
+        return;
+      }
+
+      // Close any active popup first
+      closeContactPopup();
+
+      // Set new popup details
+      currentTeacherId = teacherId;
+      document.getElementById('popupContactInfo').textContent = "Contact information is currently hidden.";
+
+      // Show the popup
+      document.getElementById('contactPopup').style.display = 'flex';
+
+      // Handle the payment button
+      document.getElementById('paymentButton').onclick = function() {
+        // Simulate payment success
+        document.getElementById('popupContactInfo').textContent = "Contact Email: " + email;
+      };
+    }
+</script>
+
+  
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 {% endblock %}

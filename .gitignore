@@ -1,3 +1,4 @@
 /staticfiles/
 media/
 **/migrations/
+settings_local.py

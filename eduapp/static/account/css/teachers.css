@@ -1,5 +1,11 @@
+/* Universal Reset for Form Elements */
+input, select, textarea {
+    border: none;  /* Remove border */
+    outline: none; /* Remove outline */
+    box-shadow: none; /* Remove box-shadow */
+}
+
 /* Form Container */
-/* Form Heading */
 h2 {
     color: #333;
     font-weight: 700;
@@ -16,27 +22,13 @@ h2 {
     z-index: 1000; /* Ensure it is in front */
 }
 
-h2::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -12px;
-    width: 60%;
-    height: 3px;
-    background: #007bff;
-    transform: translateX(-50%);
-}
-
 body {
-    margin-top: 0; /* Ensure no margin at the top */
+    margin: 0; /* Reset body margin */
     padding-top: 20px; /* Space between the top of the page and the heading */
-    height: 100vh;
-    overflow-y: auto;
     display: flex;
     flex-direction: column;
     align-items: center; /* Center content horizontally */
 }
-
 
 form {
     background: #ffffff;
@@ -70,29 +62,25 @@ label {
 }
 
 input.form-control {
-    border: 1px solid #ccc;
-    padding: 12px;
+    padding: 12px; /* Maintain padding for comfort */
     font-size: 15px;
     border-radius: 4px;
-    background: #f9f9f9;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #f9f9f9; /* Background color for visibility */
+    transition: background 0.3s ease; /* Smooth transition for background */
     width: 100%;
 }
 
+/* Focus and Validation Styles */
 input.form-control:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    background: #f1f1f1; /* Slightly darker background on focus */
 }
 
 input.form-control.is-valid {
-    border-color: #28a745;
-    box-shadow: 0 0 5px rgba(40, 167, 69, 0.2);
+    /* No border color for valid state */
 }
 
 input.form-control.is-invalid {
-    border-color: #dc3545;
-    box-shadow: 0 0 5px rgba(220, 53, 69, 0.2);
+    /* No border color for invalid state */
 }
 
 .valid-feedback, .invalid-feedback {
@@ -104,7 +92,7 @@ input.form-control.is-invalid {
 /* Button Styles */
 button.btn-primary {
     background: #007bff;
-    border: none;
+    border: none; /* No border */
     border-radius: 5px;
     padding: 12px 20px;
     font-size: 16px;
@@ -118,7 +106,7 @@ button.btn-primary {
 }
 
 button.btn-primary:hover {
-    background: #0056b3;
+    background: #0056b3; /* Darker shade on hover */
     box-shadow: 0 4px 10px rgba(0, 91, 187, 0.2);
 }
 
@@ -137,6 +125,14 @@ button.btn-primary:hover {
     cursor: pointer;
 }
 
+/* Dropdown Styling */
+.form-group select.form-control {
+    padding: 12px; /* Match padding to input fields */
+    background-color: #f9f9f9; /* Background color for visibility */
+    border-radius: 4px; /* Match input styling */
+    font-size: 15px; /* Consistent font size */
+}
+
 /* Keyframes for Animations */
 @keyframes fadeIn {
     0% {
@@ -147,4 +143,9 @@ button.btn-primary:hover {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Additional styles for a cleaner layout */
+.form-group {
+    margin-bottom: 20px; /* Space between groups */
 }

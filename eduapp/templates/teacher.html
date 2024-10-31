@@ -3,6 +3,7 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'account/css/teachers.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 <h2>Teacher Registration Form</h2>
 <!-- The form should have method="POST" and action="{% url 'save_teachers_data' %}" -->
@@ -40,6 +41,23 @@
 
     <div class="form-row">
         <div class="col-md-6 mb-3">
+            <label for="id_city">Email</label>
+            <input type="text" name="email" class="form-control is-invalid" id="id_email" placeholder="Email" required>
+            <div class="invalid-feedback">
+                Please provide a valid email.
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label for="id_zip">Contact</label>
+            <input type="text" name="contact" class="form-control is-invalid" id="id_contact" placeholder="Contact" required>
+            <div class="invalid-feedback">
+                Please provide a valid contact.
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
             <label for="id_city">City</label>
             <input type="text" name="city" class="form-control is-invalid" id="id_city" placeholder="City" required>
             <div class="invalid-feedback">
@@ -55,7 +73,7 @@
         </div>
         <div class="col-md-3 mb-3">
             <label for="id_zip">Zip</label>
-            <input type="text" name="zipcode" class="form-control is-invalid" id="id_zip" placeholder="Zip" required>
+            <input type="number" name="zipcode" class="form-control is-invalid" id="id_zip" placeholder="Zip" required>
             <div class="invalid-feedback">
                 Please provide a valid zip.
             </div>
@@ -67,6 +85,25 @@
                 Please provide valid experience.
             </div>
         </div>
+        <div class="form-group col-md-4 mb-3">
+            <label for="class_range" class="font-weight-bold">Class Range</label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-chalkboard-teacher"></i></span>
+                </div>
+                <select name="class_range" id="class_range" class="form-control" required>
+                    <option value="" disabled selected>Select Class Range</option>
+                    <option value="1-5">Class 1 to 5</option>
+                    <option value="6-10">Class 6 to 10</option>
+                    <option value="11-12">Class 11 to 12</option>
+                </select>
+                <div class="invalid-feedback">
+                    Please select a class range.
+                </div>
+            </div>
+        </div>
+        
+        
         <div class="col-md-3 mb-3">
             <label for="id_subjects">Subjects</label>
             <input type="text" name="subjects" class="form-control is-invalid" id="id_subjects" placeholder="Subjects" required>
@@ -94,7 +131,18 @@
             </div>
         </div>
     </div>
-
-    <button class="btn btn-primary" type="submit">Submit form</button>
-</form>
+    <form method="POST" action="{% url 'save_teachers_data' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- Other form fields go here -->
+    
+        <div class="form-group">
+            <label for="photo">Profile Picture</label>
+            <input type="file" name="photo" id="photo" class="form-control-file">
+            <small class="form-text text-muted">Optional. If no picture is uploaded, a default image will be used.</small>
+        </div>
+    
+        <button type="submit" class="btn btn-primary">Create Profile</button>
+    </form>
+    
+  
 {% endblock %}

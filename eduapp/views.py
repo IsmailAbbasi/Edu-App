@@ -14,9 +14,12 @@ from django.contrib.auth.decorators import login_required
 from .models import User
 from django.contrib.auth.decorators import login_required
 
-from django.shortcuts import render
+from django.shortcuts import render , redirect
 from .models import TeachersData
 from .forms import TeachersDataForm
+from django.contrib import messages
+from django.conf import settings
+import razorpay
 
 # @login_required
 # def home(request):
@@ -28,41 +31,126 @@ from .forms import TeachersDataForm
 #     # print(teachers) 
 #     return render(request, 'home.html', {'teachers': teachers})
 
-from django.shortcuts import render
-from django.db.models import Q  # For advanced querying
+# from django.db.models import Q  # For advanced querying
+
+def create_profile(request):
+    # Check if the logged-in user already has a profile
+    if TeachersData.objects.filter(user=request.user).exists():
+        messages.error(request, "You already have a profile.")
+        return redirect('home')  # Redirect to the home page or profile page
+
+    if request.method == 'POST':
+        # Handle profile creation logic
+        form = YourProfileForm(request.POST, request.FILES)  # Replace with your actual form
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = request.user
+            profile.save()
+            return redirect('home')  # Redirect after profile creation
+    else:
+        form = YourProfileForm()
+
+    return render(request, 'create_profile.html', {'form': form})
+
 from .models import TeachersData
 from django.contrib.auth.decorators import login_required
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden
+
+from django.conf import settings
+from django.contrib.staticfiles.storage import staticfiles_storage
+
+@login_required
+
+
+
+def edit_profile(request, teacher_id):
+    teacher = get_object_or_404(TeachersData, id=teacher_id)
+
+    # Ensure only the owner can edit their profile
+    if teacher.user != request.user:
+        return HttpResponseForbidden("You are not allowed to edit this profile.")
+
+    if request.method == 'POST':
+        # Update other teacher data fields
+        teacher.firstName = request.POST.get('firstName')
+        teacher.lastName = request.POST.get('lastName')
+        teacher.city = request.POST.get('city')
+        teacher.state = request.POST.get('state')
+        teacher.experience = request.POST.get('experience')
+        teacher.subjects = request.POST.get('subjects')
+        teacher.contact = request.POST.get('contact')
+        teacher.email = request.POST.get('email')
+        teacher.class_range = request.POST.get('class_range')
+
+        # Handle profile picture upload if present
+        if 'photo' in request.FILES:
+            teacher.photo = request.FILES['photo']
+        else:
+            # Use the static URL for the default profile picture
+            teacher.photo = staticfiles_storage.url('account/images/default-profile-picture1.jpg')
+
+        teacher.save()
+        return redirect('home')  # Redirect after saving
+
+    return render(request, 'profile.html', {'teacher': teacher})
+
+
+@login_required
+def profile(request, teacher_id):
+    teacher = get_object_or_404(TeachersData, id=teacher_id)
+    
+    if request.method == 'POST':
+        # Update the teacher's data
+        teacher.firstName = request.POST['firstName']
+        teacher.lastName = request.POST['lastName']
+        teacher.city = request.POST['city']
+        teacher.state = request.POST['state']
+        teacher.experience = request.POST['experience']
+        teacher.subjects = request.POST['subjects']
+        # teacher.classes = request.POST['classes']
+        teacher.contact = request.POST['contact']
+        teacher.email = request.POST['email']
+        # views.py (inside the form handling view)
+        class_range = request.POST.get('class_range')
+        teacher.class_range = class_range
+        if 'photo' in request.FILES:
+            print("here======Izzygnagd")
+            teacher.photo = request.FILES['photo']
+        
+        # Save the teacher data
+        teacher.save()
+        
+        return redirect('home')  # Redirect to home page after saving
+    
+    return render(request, 'profile.html', {'teacher': teacher})
+
+
 @login_required
 def home(request):
-    # Fetch all teachers initially
+    # Get query parameters (if filtering is needed)
+    city_query = request.GET.get('city', '')
+    state_query = request.GET.get('state', '')
+    subject_query = request.GET.get('subject', '')
+    experience_query = request.GET.get('experience', '')
+
+    # Retrieve all teacher profiles from the database
     teachers = TeachersData.objects.all()
 
-    # Get the search and filter parameters from the request (default to None if not provided)
-    name = request.GET.get('name', None)
-    location = request.GET.get('location', None)
-    subject = request.GET.get('subject', None)
-    experience_min = request.GET.get('experience_min', None)
-    experience_max = request.GET.get('experience_max', None)
+    # Apply filters based on the query parameters (if any)
+    if city_query:
+        teachers = teachers.filter(city__icontains=city_query)
+    if state_query:
+        teachers = teachers.filter(state__icontains=state_query)
+    if subject_query:
+        teachers = teachers.filter(subjects__icontains=subject_query)
+    if experience_query and experience_query != 'any':
+        teachers = teachers.filter(experience=experience_query)
 
-    # Apply filters based on search parameters if they are provided
-    if name:
-        teachers = teachers.filter(Q(firstName__icontains=name) | Q(lastName__icontains=name))
-
-    if location:
-        teachers = teachers.filter(Q(city__icontains=location) | Q(state__icontains=location) | Q(zipcode__icontains=location))
-
-    if subject:
-        teachers = teachers.filter(subjects__icontains=subject)
-
-    if experience_min:
-        teachers = teachers.filter(experience__gte=experience_min)
-    if experience_max:
-        teachers = teachers.filter(experience__lte=experience_max)
-
-    # Render the home page with filtered or unfiltered teachers data
+    # Render the home page with all teacher data
     return render(request, 'home.html', {'teachers': teachers})
-
 
 @login_required
 def student(request):
@@ -135,10 +223,10 @@ def save_teachers_data(request):
         form = TeachersDataForm(request.POST)
         if form.is_valid():
             teacher_data = form.save(commit=False)
-            teacher_data.user = request.user  # Ensure the user is set correctly
+            teacher_data.user = request.user  
             print(teacher_data)  
             teacher_data.save()
-            return redirect('home')  # Redirect after saving
+            return redirect('home')  
     else:
         form = TeachersDataForm()
     return render(request, 'teacher.html', {'form': form})
@@ -219,3 +307,45 @@ def save_teachers_data(request):
 #     else:
 #         form = TeachersDataForm()
 #     return render(request, 'teacher.html', {'form': form})
+
+
+# razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
+# def initiate_payment(request, teacher_id):
+#     teacher = TeachersData.objects.get(id=teacher_id)
+    
+#     if teacher.payment_status:
+#         return redirect('view_contact_info', teacher_id=teacher.id)
+
+#     # Razorpay order creation
+#     payment = razorpay_client.order.create({
+#         "amount": 100,  # Amount in paise (INR 100.00)
+#         "currency": "INR",
+#         "payment_capture": "1"
+#     })
+    
+#     # Pass payment and teacher details to template
+#     context = {
+#         'payment_id': payment['id'],
+#         'razorpay_key': settings.RAZORPAY_KEY_ID,
+#         'amount': 100,
+#         'teacher': teacher,
+#     }
+#     return render(request, 'payment.html', context)
+
+# def payment_success(request, teacher_id):
+#     teacher = TeachersData.objects.get(id=teacher_id)
+#     teacher.payment_status = True
+#     teacher.save()
+#     return redirect('view_contact_info', teacher_id=teacher_id)
+
+
+# # views.py
+# from django.shortcuts import render
+
+# def view_contact_info(request, teacher_id):
+#     teacher = TeachersData.objects.get(id=teacher_id)
+#     if not teacher.payment_status:
+#         return redirect('home')  # Redirect if payment is not completed
+#     return render(request, 'contact_info.html', {'teacher': teacher})
+

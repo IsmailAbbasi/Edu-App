@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher , save_teachers_data
+from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher , save_teachers_data , profile
 from django.shortcuts import redirect
-
+from eduapp import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("eduapp/", include("eduapp.urls")),
@@ -34,7 +36,14 @@ urlpatterns = [
     path('teacher/', teacher, name='teacher_page'),
     path('signup/', CustomSignupView.as_view(), name='account_signup'),
     path('save_teachers_data/', save_teachers_data, name='save_teachers_data'),
+    path('profile/<int:teacher_id>/', views.profile, name='profile'),
 
-]
+    # Edit profile URL (this allows editing a teacher's profile)
+    path('profile/<int:teacher_id>/edit/', views.edit_profile, name='edit_profile')
+] 
+    # path('initiate_payment/<int:teacher_id>/', views.initiate_payment, name='initiate_payment'),
+    # path('payment_success/<int:teacher_id>/', views.payment_success, name='payment_success'),
+    # path('contact_info/<int:teacher_id>/', views.view_contact_info, name='view_contact_info'),
 
-
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
