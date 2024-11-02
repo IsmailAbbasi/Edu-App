@@ -37,6 +37,8 @@ class TeachersData(models.Model):
     previousexperience = models.CharField(max_length=100, blank=True, null=True)
     email = models.CharField(max_length=100, blank=True, null=True)
     contact = models.DecimalField(max_digits=10, decimal_places=0, blank=True, null=True)
+    payment_status = models.BooleanField(default=False)  # or any other field type as required
+
     # classes = models.DecimalField(max_digits=10,decimal_places=2, blank=True, null=True)
     # twitter = models.URLField(null=True, blank=True)
     # linkedin = models.URLField(null=True, blank=True)

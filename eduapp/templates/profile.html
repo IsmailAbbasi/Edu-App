@@ -13,13 +13,19 @@
       font-family: 'Poppins', sans-serif;
       background-color: #f5f7fa;
     }
+    .profile-picture {
+      width: 200px;  
+      height: 150px;  /* Maintain aspect ratio */
+      border-radius: 50%;  /* Circular shape */
+      display: block;  /* Center the image if needed */
+      margin-bottom: 10px;  /* Add some space below the image */
+    }
   </style>
 </head>
 <body>
 
   <div class="container mt-5">
     <h2>Edit Profile</h2>
-    <!-- Ensure that the form has enctype="multipart/form-data" for file uploads -->
     <form method="POST" action="{% url 'edit_profile' teacher.id %}" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="form-group">
@@ -36,7 +42,7 @@
       </div>
       <div class="form-group">
         <label for="email">Email</label>
-        <input type="email" class="form-control" id="email" name="email" value="{{ teacher.email }}" required>  <!-- Use name="email" instead of "Email" -->
+        <input type="email" class="form-control" id="email" name="email" value="{{ teacher.email }}" required>
       </div>
       <div class="form-group">
         <label for="class_range">Teaches Class</label>
@@ -68,10 +74,9 @@
             <img src="{% static 'account/images/default-profile-picture1.jpg' %}" alt="Default Profile Picture" class="profile-picture">
         {% endif %}
         <input type="file" class="form-control-file" id="photo" name="photo"> 
-    </div>
-    
+      </div>
 
-      <button type="submit" class="btn btn-primary">Save</button>  <!-- Move the submit button outside of the inner form -->
+      <button type="submit" class="btn btn-primary">Save</button>
     </form>
   </div>
 

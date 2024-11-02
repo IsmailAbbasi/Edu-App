@@ -158,6 +158,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'eduapp.User'
 
-from .settings_local import *
+# from .settings_local import *
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+RAZORPAY_API_KEY = 'rzp_test_CFh1GNiQmvDphx'
+RAZORPAY_API_SECRET = 'HITnv5mri6M89eGGJMUTonhu'

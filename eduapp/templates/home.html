@@ -6,7 +6,7 @@
 
 <head>
   <link rel="stylesheet" href="{% static 'account/css/main.css' %}">
-
+  
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teacher Directory</title>
@@ -17,7 +17,9 @@
   
   <!-- Font Awesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  
+  <link rel="icon" href="{% static 'account/favicon.ico' %}" type="image/x-icon">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script> <!-- Razorpay Script -->
+
   <style>
   
   </style>
@@ -149,6 +151,8 @@
             <a href="#"><i class="fab fa-linkedin"></i></a>
           </div>
 
+          <a href="{% url 'view_profile' teacher.id %}" class="btn btn-outline-primary btn-sm mb-2">View Profile</a>
+
           <!-- Contact Button -->
           <button class="btn btn-primary contact-button" onclick="openContactPopup('{{ teacher.id }}', '{{ teacher.email }}')">Contact</button>
         </div>
@@ -174,41 +178,73 @@
       <p class="text-muted">© 2024 Your Company Name. All rights reserved.</p>
   </div>
 </footer>
-
+<div id="contactPopup" style="display:none;">
+  <div id="popupContactInfo">Contact information is currently hidden.</div>
+  <button id="paymentButton">Pay to View Contact</button>
+  <button onclick="closeContactPopup()">Close</button>
+</div>
 <script>
   let activePopup = null;  // Keep track of the currently active popup
-    let currentTeacherId = null;  // Track the currently viewed teacher
+  let currentTeacherId = null;  // Track the currently viewed teacher
+  let currentEmail = null;  // Track the current email for the teacher
 
-    function closeContactPopup() {
-      document.getElementById('contactPopup').style.display = 'none';
-      activePopup = null;  // Reset the active popup
+  function closeContactPopup() {
+    document.getElementById('contactPopup').style.display = 'none';
+    activePopup = null;  // Reset the active popup
+    currentTeacherId = null;  // Reset current teacher ID
+    currentEmail = null;  // Reset current email
+  }
+
+  function openContactPopup(teacherId, email) {
+    if (currentTeacherId === teacherId && activePopup) {
+      return; // Do nothing if the same popup is already open
     }
 
-    function openContactPopup(teacherId, email) {
-      // If it's the same teacher, don't reopen
-      if (currentTeacherId === teacherId && activePopup) {
-        return;
-      }
+    closeContactPopup(); // Close any currently active popup
 
-      // Close any active popup first
-      closeContactPopup();
+    currentTeacherId = teacherId;
+    currentEmail = email;  // Store the email to display after payment
+    document.getElementById('popupContactInfo').textContent = "Contact information is currently hidden.";
+    document.getElementById('contactPopup').style.display = 'flex';
+    activePopup = 'contactPopup'; // Mark this popup as active
 
-      // Set new popup details
-      currentTeacherId = teacherId;
-      document.getElementById('popupContactInfo').textContent = "Contact information is currently hidden.";
+    // Handle the payment button
+    document.getElementById('paymentButton').onclick = function() {
+      var options = {
+        "key": "rzp_test_CFh1GNiQmvDphx", // Replace with your actual Razorpay key
+        "amount": 500, 
+        "currency": "INR",
+        "name": "Edu app",
+        "description": "Payment to view contact info",
+        "handler": function(response) {
+        // Handle the response from Razorpay here
+        if (response.razorpay_payment_id) {
+            // Redirect to the details page on successful payment
+            // window.location.href = `/view_contact_info/${teacherId}`; // Include teacherId dynamically 
+            window.location.href = "{% url 'verify_payment' %}?razorpay_payment_id=" + response.razorpay_payment_id + "&teacher_id=" + teacherId;
+          } else {
+            alert("Payment was unsuccessful. Please try again.");
+        }
+        document.getElementById('popupContactInfo').textContent = "Contact Email: " + currentEmail;
 
-      // Show the popup
-      document.getElementById('contactPopup').style.display = 'flex';
-
-      // Handle the payment button
-      document.getElementById('paymentButton').onclick = function() {
-        // Simulate payment success
-        document.getElementById('popupContactInfo').textContent = "Contact Email: " + email;
+          // You can also perform other actions here if needed, like sending the payment details to your server
+        },
+        "prefill": {
+          "name": "Customer Name", // Optional
+          "email": "customer@example.com", // Optional
+          "contact": "9999999999" // Optional
+        },
+        "theme": {
+          "color": "#F37254" 
+        }
       };
-    }
+
+      var rzp1 = new Razorpay(options);
+      rzp1.open();
+    };
+  }
 </script>
 
-  
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
 </body>

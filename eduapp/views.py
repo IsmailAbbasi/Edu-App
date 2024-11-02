@@ -12,7 +12,6 @@ from django.db import models
 
 from django.contrib.auth.decorators import login_required
 from .models import User
-from django.contrib.auth.decorators import login_required
 
 from django.shortcuts import render , redirect
 from .models import TeachersData
@@ -20,18 +19,8 @@ from .forms import TeachersDataForm
 from django.contrib import messages
 from django.conf import settings
 import razorpay
-
-# @login_required
-# def home(request):
-#     if request.user.is_authenticated:  # Check if the user is authenticated
-
-#         teachers = TeachersData.objects.all()
-#     else:
-#         teachers = None    
-#     # print(teachers) 
-#     return render(request, 'home.html', {'teachers': teachers})
-
-# from django.db.models import Q  # For advanced querying
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 def create_profile(request):
     # Check if the logged-in user already has a profile
@@ -232,69 +221,6 @@ def save_teachers_data(request):
     return render(request, 'teacher.html', {'form': form})
     
 
-# from django.shortcuts import render, redirect
-# from allauth.account.forms import LoginForm, SignupForm
-# from allauth.account.views import SignupView  # Import SignupView from allauth
-# from django.contrib.auth.mixins import LoginRequiredMixin
-# from django.contrib.messages.views import SuccessMessageMixin
-# from django.urls import reverse_lazy, reverse
-# from django.contrib.auth.decorators import login_required
-# from django.contrib.auth.models import User  # Import User model
-# from .models import TeachersData
-# from .forms import TeachersDataForm
-# from django.views.generic import UpdateView
-
-
-
-# def home(request):
-#     teachers = TeachersData.objects.all()
-#     return render(request, 'home.html', {'teachers': teachers})
-
-# @login_required
-# def student(request):
-#     return render(request, 'student.html')
-
-# @login_required
-# def teacher(request):
-#     return render(request, 'teacher.html')
-
-# class CustomSignupView(SignupView):
-#     def get_success_url(self):
-#         # Redirect to the role selection page after signup
-#         return reverse('role')
-
-# @login_required
-# def role(request):
-#     if request.method == 'POST':
-#         role = request.POST.get('role')
-#         request.user.role = 'T' if role == 'teacher' else 'S'
-#         request.user.save()
-
-#         if role == 'student':
-#             return redirect('student_page')
-#         elif role == 'teacher':
-#             return redirect('teacher_page')
-#         else:
-#             return redirect('home')
-#     return render(request, 'role.html')
-
-# def contact(request):
-#     return render(request, 'contact.html')
-
-# def dashboard(request):
-#     return render(request, 'dashboard.html')
-
-# class ChangeUsername(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
-#     model = User
-#     fields = ['username']
-#     template_name = 'change_username.html'
-#     success_message = "Username updated successfully"
-
-#     def get_object(self, queryset=None):
-#         return self.request.user
-
-#     def get_success_url(self):
-#         return reverse_lazy('account_login')
 
 # def save_teachers_data(request):
 #     if request.method == "POST":
@@ -349,3 +275,66 @@ def save_teachers_data(request):
 #         return redirect('home')  # Redirect if payment is not completed
 #     return render(request, 'contact_info.html', {'teacher': teacher})
 
+
+client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
+
+def create_payment(request):
+    amount = 500  # Amount in paise 
+    order_currency = 'INR'
+    order_receipt = 'order_rcptid_11'
+    notes = {'info': 'Payment for contact details'}
+
+    razorpay_order = client.order.create({
+        'amount': amount,
+        'currency': order_currency,
+        'receipt': order_receipt,
+        'notes': notes
+    })
+
+    context = {
+        'order_id': razorpay_order['id'],
+        'amount': amount,
+        'razorpay_key': settings.RAZORPAY_API_KEY,
+    }
+    return render(request, 'payment.html', context)
+
+@csrf_exempt
+def verify_payment(request):
+    print("yes verifying payment ;) ")
+    payment_id = request.GET.get('razorpay_payment_id')
+    teacher_id = int(request.GET.get('teacher_id'))
+    
+    payment = client.payment.fetch(payment_id)
+    if payment['status'] == 'authorized' or payment['status'] == 'captured':
+        print("yes saving teacher paystatus status ;) ")
+        teacher = TeachersData.objects.get(id=teacher_id)
+        teacher.payment_status = True
+        teacher.save()
+        return redirect('view_contact_info', teacher_id=teacher_id)
+    else:
+        print(payment['status'], payment)
+        return redirect('home')
+        # return JsonResponse({'status': 'failure'}, status=400)
+
+
+# def view_profile(request, teacher_id):
+#     teacher = get_object_or_404(Teacher, id=teacher_id)
+#     show_contact = request.user.has_paid
+#     return render(request, 'view_profile.html', {'teacher': teacher, 'show_contact': show_contact})
+def view_profile(request, teacher_id):
+    teacher = get_object_or_404(TeachersData, id=teacher_id)
+    photo_url = teacher.get_profile_picture() 
+    return render(request, 'view_profile.html', {'teacher': teacher, 'photo_url': photo_url})
+
+@login_required
+def view_contact_info(request, teacher_id):
+    teacher = get_object_or_404(TeachersData, id=teacher_id)
+    photo_url = teacher.get_profile_picture()
+    print(f'Payment Status for {teacher_id}: {teacher.payment_status}')  # Debugging line
+    if teacher.payment_status:
+        return render(request, 'view_contact_info.html', {
+            'teacher': teacher,
+            'photo_url': teacher.photo.url if teacher.photo else 'default_image_url.png'  # Use a default if no image
+        })
+    else:
+        return render(request, 'payment.html', {'teacher': teacher, 'photo_url': photo_url})

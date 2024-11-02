@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Profile</title>
+    <link rel="stylesheet" href="{% static 'account/css/view.css' %}">
+
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-image">
+                {% if teacher.photo %}
+                <img src="{{ teacher.photo.url }}" alt="Profile Picture" class="profile-picture">
+            {% else %}
+                <img src="{% static 'account/images/default-profile-picture1.jpg' %}" alt="Default Profile Picture" class="profile-picture">
+            {% endif %}
+                        </div>
+            <div class="profile-details">
+                <h1>{{ teacher.firstName }} {{ teacher.lastName }}</h1>
+                <p class="profile-username">@{{ teacher.username }}</p>
+                <p class="profile-location">{{ teacher.city }}, {{ teacher.state }}</p>
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <h2>About</h2>
+            <p><strong>Experience:</strong> {{ teacher.experience }} years</p>
+            <p><strong>Subjects:</strong> {{ teacher.subjects }}</p>
+            <p><strong>Class Range:</strong> {{ teacher.class_range }}</p>
+            <p> <strong>City:</strong> {{ teacher.city }}</p>
+          <p ><strong>State:</strong> {{ teacher.state }}</p>
+        </div>
+    </div>
+</body>
+</html>
