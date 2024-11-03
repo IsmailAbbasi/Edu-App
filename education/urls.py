@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher , save_teachers_data , profile, view_profile, edit_profile, verify_payment,view_contact_info 
+from eduapp.views import  home, contact, dashboard, ChangeUsername, role , CustomSignupView , student, teacher , save_teachers_data , profile, view_profile, edit_profile, verify_payment,view_contact_info,my_teachers
 from django.shortcuts import redirect
 from eduapp import views
 from django.conf import settings
@@ -42,7 +42,9 @@ urlpatterns = [
     path('profile/<int:teacher_id>/edit/', edit_profile, name='edit_profile'),
     path('profile/view/<int:teacher_id>/', view_profile, name='view_profile'),
     path('verify_payment/', verify_payment, name='verify_payment'),
-    path('view_contact_info/<int:teacher_id>/', view_contact_info, name='view_contact_info')
+    path('view_contact_info/<int:teacher_id>/', view_contact_info, name='view_contact_info'),
+    # path('add_teacher/<int:teacher_id>/', add_teacher, name='add_teacher'),
+    path('my_teachers/', my_teachers, name='my_teachers'),  
 
 
 ] 

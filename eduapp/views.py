@@ -9,18 +9,20 @@ from allauth.account.forms import LoginForm
 from allauth.account.views import SignupView
 from django.urls import reverse
 from django.db import models
-
 from django.contrib.auth.decorators import login_required
 from .models import User
-
 from django.shortcuts import render , redirect
-from .models import TeachersData
+from .models import UserSubscription, TeachersData
 from .forms import TeachersDataForm
 from django.contrib import messages
 from django.conf import settings
 import razorpay
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.http import HttpResponse
+from django.utils import timezone
+from datetime import timedelta
+from .models import UserPaymentHistory
 
 def create_profile(request):
     # Check if the logged-in user already has a profile
@@ -265,17 +267,6 @@ def save_teachers_data(request):
 #     teacher.save()
 #     return redirect('view_contact_info', teacher_id=teacher_id)
 
-
-# # views.py
-# from django.shortcuts import render
-
-# def view_contact_info(request, teacher_id):
-#     teacher = TeachersData.objects.get(id=teacher_id)
-#     if not teacher.payment_status:
-#         return redirect('home')  # Redirect if payment is not completed
-#     return render(request, 'contact_info.html', {'teacher': teacher})
-
-
 client = razorpay.Client(auth=(settings.RAZORPAY_API_KEY, settings.RAZORPAY_API_SECRET))
 
 def create_payment(request):
@@ -300,21 +291,35 @@ def create_payment(request):
 
 @csrf_exempt
 def verify_payment(request):
-    print("yes verifying payment ;) ")
     payment_id = request.GET.get('razorpay_payment_id')
-    teacher_id = int(request.GET.get('teacher_id'))
-    
-    payment = client.payment.fetch(payment_id)
-    if payment['status'] == 'authorized' or payment['status'] == 'captured':
-        print("yes saving teacher paystatus status ;) ")
-        teacher = TeachersData.objects.get(id=teacher_id)
-        teacher.payment_status = True
-        teacher.save()
-        return redirect('view_contact_info', teacher_id=teacher_id)
-    else:
-        print(payment['status'], payment)
+    teacher_id = request.GET.get('teacher_id')
+
+    try:
+        payment = client.payment.fetch(payment_id)
+
+        UserPaymentHistory.objects.create(
+            user=request.user,
+            amount=payment['amount'],
+
+            payment_id=payment_id,
+            payment_status=payment['status']
+        )
+
+        if payment['status'] in ['authorized', 'captured']:
+            # Get or update the user's payment status
+            teacher = TeachersData.objects.get(id=teacher_id)  # Retrieve teacher instance
+
+            user_payment_status, created = UserSubscription.objects.get_or_create(
+                user=request.user,
+                teacher=teacher  # Include teacher object here
+            )
+            user_payment_status.save()
+            return redirect('view_contact_info', teacher_id=teacher_id)
+        else:
+            return redirect('home')
+    except Exception as e:
+        print(f"Error in payment verification: {e}")
         return redirect('home')
-        # return JsonResponse({'status': 'failure'}, status=400)
 
 
 # def view_profile(request, teacher_id):
@@ -323,9 +328,17 @@ def verify_payment(request):
 #     return render(request, 'view_profile.html', {'teacher': teacher, 'show_contact': show_contact})
 def view_profile(request, teacher_id):
     teacher = get_object_or_404(TeachersData, id=teacher_id)
-    photo_url = teacher.get_profile_picture() 
-    return render(request, 'view_profile.html', {'teacher': teacher, 'photo_url': photo_url})
+    user_payment_status = UserSubscription.objects.filter(user=request.user, teacher=teacher).first()
 
+    if not user_payment_status:
+        return HttpResponse('You have not subscribed to this teacher.')
+    if not user_payment_status.is_valid:
+        return HttpResponse('This subscription has expired.')
+
+    return render(request, 'view_profile.html', {
+        'teacher': teacher,
+        'user_payment_status': user_payment_status
+    })
 @login_required
 def view_contact_info(request, teacher_id):
     teacher = get_object_or_404(TeachersData, id=teacher_id)
@@ -338,3 +351,14 @@ def view_contact_info(request, teacher_id):
         })
     else:
         return render(request, 'payment.html', {'teacher': teacher, 'photo_url': photo_url})
+
+@login_required
+def my_teachers(request):
+    subscriptions = UserSubscription.objects.filter(
+        user=request.user,
+        # payment_expiration__gte=timezone.now()
+    ).select_related('teacher')
+
+    return render(request, 'my_teachers.html', {
+        'subscriptions': subscriptions,
+    })

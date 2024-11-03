@@ -1,0 +1,19 @@
+{% extends "home.html" %}
+
+{% block content %}
+    {% if not subscriptions %}
+        You have not subscribed to any teacher yet.
+    {% else %}
+
+        {% for subscription in subscriptions %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ subscription.teacher.firstName }} {{ subscription.teacher.lastName }}</h5>
+                    <p class="card-text">{{ subscription.teacher.city }}, {{ subscription.teacher.state }}</p>
+                    <a href="{% url 'view_contact_info' subscription.teacher.id %}" class="btn btn-primary">View Contact Info</a>
+                </div>
+            </div>
+        {% endfor %}
+
+    {% endif %}
+{% endblock %}

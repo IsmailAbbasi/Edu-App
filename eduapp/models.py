@@ -11,6 +11,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
+from django.utils import timezone
 
 class User(AbstractUser):
     USER_CHOICES = (
@@ -58,3 +62,26 @@ class TeachersData(models.Model):
         return self.photo.url if self.photo else '/static/account/images/default-profile-picture1.jpg'
     def __str__(self):
         return self.username
+
+class UserPaymentHistory(models.Model): # Model to keep track of all user payments
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    payment_id = models.CharField(max_length=255)
+    payment_status = models.CharField(max_length=255)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    
+class UserSubscription(models.Model): # Model to keep track of teacher subscriptions user has paid for
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(TeachersData, on_delete=models.CASCADE)
+
+    created_at = models.DateTimeField(default=timezone.now)
+    valid_until = models.DateTimeField(default=timezone.now() + timedelta(days=30))
+
+    @property
+    def is_valid(self):
+        return self.valid_until > timezone.now()
+
+    class Meta:
+        unique_together = ('user', 'teacher')
