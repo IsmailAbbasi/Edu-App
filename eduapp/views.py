@@ -145,7 +145,7 @@ def home(request):
 
 @login_required
 def student(request):
-    return render(request, 'student.html')
+    return render(request, 'teacher.html')
 
 @login_required
 def teacher(request):
@@ -176,7 +176,7 @@ def role(request):
         request.user.save()
 
         if role == 'student':
-            return redirect('student_page')  # Redirect to the student page
+            return redirect('teacher_page')  # Redirect to the student page
         elif role == 'teacher':
             return redirect('teacher_page')  # Redirect to the teacher page
         else:
@@ -339,19 +339,33 @@ def view_profile(request, teacher_id):
         'teacher': teacher,
         'user_payment_status': user_payment_status
     })
-@login_required
+# @login_required
+# def view_contact_info(request, teacher_id):
+#     teacher = get_object_or_404(TeachersData, id=teacher_id)
+#     photo_url = teacher.get_profile_picture()
+#     print(f'Payment Status for {teacher_id}: {teacher.payment_status}')  # Debugging line
+#     if teacher.payment_status:
+#         return render(request, 'view_contact_info.html', {
+#             'teacher': teacher,
+#             'photo_url': teacher.photo.url if teacher.photo else 'default_image_url.png'  # Use a default if no image
+#         })
+#     else:
+#         return render(request, 'payment.html', {'teacher': teacher, 'photo_url': photo_url})
 def view_contact_info(request, teacher_id):
     teacher = get_object_or_404(TeachersData, id=teacher_id)
     photo_url = teacher.get_profile_picture()
-    print(f'Payment Status for {teacher_id}: {teacher.payment_status}')  # Debugging line
-    if teacher.payment_status:
-        return render(request, 'view_contact_info.html', {
-            'teacher': teacher,
-            'photo_url': teacher.photo.url if teacher.photo else 'default_image_url.png'  # Use a default if no image
-        })
-    else:
-        return render(request, 'payment.html', {'teacher': teacher, 'photo_url': photo_url})
+    user_payment_status = UserSubscription.objects.filter(user=request.user, teacher=teacher).first()
 
+    if not user_payment_status:
+        return render(request, 'payment.html', {'teacher': teacher, 'photo_url': photo_url})
+    if not user_payment_status.is_valid:
+        return HttpResponse('This subscription has expired.')
+
+    return render(request, 'view_contact_info.html', {
+        'teacher': teacher,
+        'photo_url': teacher.photo.url if teacher.photo else 'default_image_url.png',
+        'user_payment_status': user_payment_status
+    })
 @login_required
 def my_teachers(request):
     subscriptions = UserSubscription.objects.filter(
